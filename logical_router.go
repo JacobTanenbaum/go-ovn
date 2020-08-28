@@ -37,6 +37,60 @@ type LogicalRouter struct {
 	ExternalID map[interface{}]interface{}
 }
 
+type LogicalRouterInterface struct {
+	client Client
+}
+
+func LogicalRouterAPI(client Client) CRUDInterface {
+	return &LogicalRouterInterface{
+		client: client,
+	}
+}
+
+func (lr *LogicalRouterInterface) Create(obj interface{}) (interface{}, error) {
+	logicalRouter, ok := obj.(LogicalRouter)
+
+	if !ok {
+		return nil, fmt.Errorf("object passed to create is not a logical router")
+	}
+	row := make(OVNRow)
+	namedUUID, err := newRowUUID()
+	if err != nil {
+		return nil, err
+	}
+	row["name"] = logicalRouter.Name
+
+	insertOp := libovsdb.Operation{
+		Op:       opInsert,
+		Table:    TableLogicalRouter,
+		Row:      row,
+		UUIDName: namedUUID,
+	}
+	operations := []libovsdb.Operation{insertOp}
+	lr.client.Execute(&OvnCommand{operations, lr.client, make([][]map[string]interface{}, len(operations))})
+
+	return obj, nil
+}
+
+func (lr *LogicalRouterInterface) Update() (interface{}, error) {
+
+	return nil, nil
+}
+
+func (lr *LogicalRouterInterface) Delete() error {
+
+	return nil
+}
+
+func (lr *LogicalRouterInterface) Get() (interface{}, error) {
+	return nil, nil
+
+}
+
+func (lr *LogicalRouterInterface) List() ([]interface{}, error) {
+	return nil, nil
+}
+
 func (odbi *ovndb) lrAddImp(name string, external_ids map[string]string) (*OvnCommand, error) {
 	namedUUID, err := newRowUUID()
 	if err != nil {

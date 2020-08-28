@@ -50,6 +50,9 @@ func main() {
 	// 1) ovndbapi.Execute(specificCommand)
 	// 2) specificCommand.Execute()
 
+	logical_router := goovn.LogicalRouter{}
+	goovn.LogicalRouterAPI(ovndbapi).Create(logical_router)
+
 	ocmd, _ := ovndbapi.LSAdd("ls1")
 	ovndbapi.Execute(ocmd)
 	ocmd, _ = ovndbapi.LSPAdd("ls1", "test")
