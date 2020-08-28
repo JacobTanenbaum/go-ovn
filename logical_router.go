@@ -38,36 +38,58 @@ type LogicalRouter struct {
 }
 
 type LogicalRouterInterface struct {
-	client Client
+	db DatabaseInterface
 }
 
-func LogicalRouterAPI(client Client) CRUDInterface {
+func LogicalRouterAPI(dbInterface DatabaseInterface) CRUDInterface {
 	return &LogicalRouterInterface{
-		client: client,
+		db: dbInterface,
 	}
 }
 
 func (lr *LogicalRouterInterface) Create(obj interface{}) (interface{}, error) {
 	logicalRouter, ok := obj.(LogicalRouter)
-
 	if !ok {
 		return nil, fmt.Errorf("object passed to create is not a logical router")
 	}
 	row := make(OVNRow)
-	namedUUID, err := newRowUUID()
-	if err != nil {
-		return nil, err
+	if len(logicalRouter.UUID) == 0 {
+		namedUUID, err := newRowUUID()
+		if err != nil {
+			return nil, err
+		}
+		logicalRouter.UUID = namedUUID
 	}
+
 	row["name"] = logicalRouter.Name
+	if logicalRouter.Options != nil {
+		oMap, err := libovsdb.NewOvsMap(logicalRouter.Options)
+		if err != nil {
+			return nil, err
+		}
+		row["options"] = oMap
+	}
+	if logicalRouter.ExternalID != nil {
+		oMap, err := libovsdb.NewOvsMap(logicalRouter.ExternalID)
+		if err != nil {
+			return nil, err
+		}
+		row["external_ids"] = oMap
+	}
+	//TODO: check if already exists
 
 	insertOp := libovsdb.Operation{
 		Op:       opInsert,
 		Table:    TableLogicalRouter,
 		Row:      row,
-		UUIDName: namedUUID,
+		UUIDName: logicalRouter.UUID,
 	}
 	operations := []libovsdb.Operation{insertOp}
-	lr.client.Execute(&OvnCommand{operations, lr.client, make([][]map[string]interface{}, len(operations))})
+	lr.db.Test()
+	err := lr.db.Execute(&OvnCommand{operations, lr.db, make([][]map[string]interface{}, len(operations))})
+	if err != nil {
+		return nil, err
+	}
 
 	return obj, nil
 }
@@ -82,7 +104,7 @@ func (lr *LogicalRouterInterface) Delete() error {
 	return nil
 }
 
-func (lr *LogicalRouterInterface) Get() (interface{}, error) {
+func (lr *LogicalRouterInterface) Get(uuid string) (interface{}, error) {
 	return nil, nil
 
 }

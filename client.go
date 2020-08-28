@@ -571,6 +571,10 @@ func (c *ovndb) Execute(cmds ...*OvnCommand) error {
 	return c.execute(cmds...)
 }
 
+func (c *ovndb) GetRowUUID(table string, row OVNRow) string {
+	return c.getRowUUID(table, row)
+}
+
 func (c *ovndb) LSGet(ls string) ([]*LogicalSwitch, error) {
 	return c.lsGetImp(ls)
 }
