@@ -31,6 +31,7 @@ const (
 )
 
 var ovndbapi goovn.Client
+var db goovn.DatabaseInterface
 
 func init() {
 	var err error
@@ -51,7 +52,7 @@ func main() {
 	// 2) specificCommand.Execute()
 
 	logical_router := goovn.LogicalRouter{}
-	goovn.LogicalRouterAPI(ovndbapi).Create(logical_router)
+	goovn.LogicalRouterAPI(db).Create(logical_router)
 
 	ocmd, _ := ovndbapi.LSAdd("ls1")
 	ovndbapi.Execute(ocmd)

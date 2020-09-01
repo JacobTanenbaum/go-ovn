@@ -125,3 +125,12 @@ func getOVNClient(db string) (ovndbapi Client) {
 	}
 	return api
 }
+
+func getOVNDatabase(db string) (ovndbapi DatabaseInterface) {
+	cfg := buildOvnDbConfig(db)
+	api, err := NewDatabase(cfg)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return api
+}

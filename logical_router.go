@@ -85,7 +85,7 @@ func (lr *LogicalRouterInterface) Create(obj interface{}) (interface{}, error) {
 		UUIDName: logicalRouter.UUID,
 	}
 	operations := []libovsdb.Operation{insertOp}
-	lr.db.Test()
+	//lr.db.Test()
 	err := lr.db.Execute(&OvnCommand{operations, lr.db, make([][]map[string]interface{}, len(operations))})
 	if err != nil {
 		return nil, err
@@ -105,6 +105,10 @@ func (lr *LogicalRouterInterface) Delete() error {
 }
 
 func (lr *LogicalRouterInterface) Get(uuid string) (interface{}, error) {
+	var lRouter *LogicalRouter
+
+	lr.db.Lock("Rlock")
+	defer lr.db.Unlock("Rlock")
 	return nil, nil
 
 }

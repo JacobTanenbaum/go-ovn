@@ -9,16 +9,16 @@ import (
 const LB4 = "lb4"
 
 func TestLogicalRouter(t *testing.T) {
-	ovndbapi := getOVNClient(DBNB)
+	ovndbapi := getOVNDatabase(DBNB)
 	var cmds []*OvnCommand
 	var cmd *OvnCommand
 	var err error
 
-	cmds = make([]*OvnCommand, 0)
-	cmd, err = ovndbapi.LRAdd(LR, nil)
-	if err != nil {
-		t.Fatal(err)
-	}
+	//cmds = make([]*OvnCommand, 0)
+	//cmd, err = ovndbapi.LRAdd(LR, nil)
+	//if err != nil {
+	//	t.Fatal(err)
+	//}
 
 	cmds = append(cmds, cmd)
 	err = ovndbapi.Execute(cmds...)
@@ -26,13 +26,15 @@ func TestLogicalRouter(t *testing.T) {
 		t.Fatal(err)
 	}
 	logicalRouter := LogicalRouter{
-		Name: "test1",
+		Name:       "test1",
+		ExternalID: map[interface{}]interface{}{"namespace": "test"},
 	}
-	//lr, err := LogicalRouterAPI(ovndbapi).Create(logicalRouter)
-	//if err != nil {
-	//	t.Fatal(err)
-	//}
+	lr, err := LogicalRouterAPI(ovndbapi).Create(logicalRouter)
+	if err != nil {
+		t.Fatal(err)
+	}
 	fmt.Printf("KEYWORD: %v\n", logicalRouter)
+	fmt.Printf("KEYWORD: %v\n", lr)
 	/*
 		lrs, err := ovndbapi.LRList()
 		if err != nil {
